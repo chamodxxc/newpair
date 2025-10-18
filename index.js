@@ -1,50 +1,29 @@
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
-const path = require('path');
-
-// PORT setup (Render හිතන විදිහට)
+__path = process.cwd()
+const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 8000;
-
-// Path variable
-const __path = process.cwd();
-
-// Load your routes
-const server = require('./qr');
-const code = require('./pair');
-
-// Avoid memory leak warnings
+let server = require('./qr'),
+    code = require('./pair');
 require('events').EventEmitter.defaultMaxListeners = 500;
-
-// Middlewares
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Routes
 app.use('/server', server);
 app.use('/code', code);
+app.use('/pair',async (req, res, next) => {
+res.sendFile(__path + '/pair.html')
+})
+app.use('/qr',async (req, res, next) => {
+res.sendFile(__path + '/qr.html')
+})
+app.use('/',async (req, res, next) => {
+res.sendFile(__path + '/main.html')
+})
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.listen(PORT, () => {
+    console.log(`
+Don't Forgot To Give Star WHITESHADOW-MD
 
-app.get('/pair', (req, res) => {
-  res.sendFile(path.join(__path, 'pair.html'));
-});
+ Server running on http://localhost:` + PORT)
+})
 
-app.get('/qr', (req, res) => {
-  res.sendFile(path.join(__path, 'qr.html'));
-});
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__path, 'main.html'));
-});
-
-// Start server (Render detect වෙන්න 0.0.0.0 bind එක)
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ WHITESHADOW-MD Server Running
-🌐 URL: http://localhost:${PORT}
-⭐ Don't forget to star WHITESHADOW-MD repo!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  `);
-});
-
-module.exports = app;
+module.exports = app
