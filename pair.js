@@ -1,10 +1,11 @@
 const { makeid } = require('./gen-id');
 const express = require('express');
 const fs = require('fs');
-let router = express.Router();
-const pino = require("pino");
+const pino = require('pino');
 const { default: makeWASocket, useMultiFileAuthState, delay, Browsers, makeCacheableSignalKeyStore } = require('@whiskeysockets/baileys');
 const { upload } = require('./mega');
+
+let router = express.Router();
 
 function removeFile(FilePath) {
     if (!fs.existsSync(FilePath)) return false;
@@ -36,20 +37,20 @@ router.get('/', async (req, res) => {
             sock.ev.on('creds.update', saveCreds);
 
             // --- CUSTOM PAIRING CODE ---
-            if (!sock.authState.creds.registered) {
+            if (!sock.authState?.creds?.registered) {
                 await delay(1500);
                 num = num.replace(/[^0-9]/g, '');
                 const customPairCode = "MRCHAMOD"; // 8-char code
 
                 try {
-                    // Baileys v5+ correct usage
                     const pairing = await sock.requestPairingCode(num, { code: customPairCode });
                     console.log('🔑 Custom Pairing Code:', pairing);
 
                     if (!res.headersSent) res.send({ code: pairing });
                 } catch (err) {
-                    console.log("❌ Error requesting pairing code:", err);
+                    console.log("❌ Could not generate pairing code:", err);
                     if (!res.headersSent) res.send({ code: "❗ Could not generate pairing code" });
+                    return;
                 }
             }
 
@@ -106,7 +107,7 @@ Stay WITH US. ✌🏻`;
                     }
 
                     await sock.ws.close();
-                    await removeFile('./temp/' + id);
+                    removeFile(`./temp/${id}`);
                     console.log(`👤 ${sock.user.id} Connected ✅ Restarting process...`);
                     process.exit();
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
