@@ -9,7 +9,7 @@
      "restart": "pm2 restart WHITESHADOW-MD"
     },
   "dependencies": {
-   "@whiskeysockets/baileys": "npm:@zenzxz/baileys@latest",       
+   "@whiskeysockets/baileys": "npm:alisaai-baileys@latest",       
     "@adiwajshing/keyed-db": "^0.2.4",
     "qrcode": "^1.5.3",
     "awesome-phonenumber": "^2.64.0",
